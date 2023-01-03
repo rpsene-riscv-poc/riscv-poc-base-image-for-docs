@@ -1,13 +1,15 @@
-name: Build and Run Base Container Image
+name: Build Base Container Image
 
 on:
   pull_request:
     types: [opened, reopened, edited]
     branches: [main]
+    paths:
+      - 'Dockerfiles/ubuntu2204'
 
 jobs:
   build-and-run-image:
-    name: Build and Run Image Based on 
+    name: Build Image
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -27,5 +29,5 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           context: .
-          file: ./Dockerfiles/ubuntu2004
+          file: ./Dockerfiles/ubuntu2204
           platforms: linux/amd64,linux/arm64

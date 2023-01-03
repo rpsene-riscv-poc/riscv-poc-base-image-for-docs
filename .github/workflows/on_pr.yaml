@@ -1,12 +1,13 @@
-name: Build and Publish Base Container Image
+name: Build and Run Base Container Image
 
 on:
-  push:
+  pull_request:
+    types: [opened, reopened, edited]
     branches: [main]
 
 jobs:
-  build-and-push-docker-image:
-    name: Build and Push to Docker Hub
+  build-and-run-image:
+    name: Build and Run Image Based on 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,13 +20,6 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Login to Docker Hub
-        if: github.event_name != 'pull_request'
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
       - name: Get Current Date
         run: echo "NOW=$(date +'%m%d%Y')" >> $GITHUB_ENV
 
@@ -36,5 +30,7 @@ jobs:
           file: ./Dockerfiles/ubuntu2004
           platforms: linux/amd64,linux/arm64
           tags: |
-            rpsene/rpsene-riscv-poc-image:latest
-          push: ${{ github.event_name != 'pull_request' }}
+            rpsene/rpsene-riscv-poc-image:pr
+      - name: Run New Image
+        run: |
+            docker run --rm rpsene/rpsene-riscv-poc-image:pr /bin/bash 
